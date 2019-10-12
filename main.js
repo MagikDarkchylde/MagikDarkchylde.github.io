@@ -47,7 +47,7 @@ function gameLoop() {
 	//clearRect: x,y, width screen, height screen
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	//update player position
-	char.update
+	char.update();
 	//collision
 	let collision1 = stageCollision( { x: char.x, y: char.y, width: char.charWH, height: char.charWH }, { width: canvas.width, height: canvas.height });
 	if (collision1 !== "") {
