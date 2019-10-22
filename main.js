@@ -2,7 +2,7 @@ import { game } from "./engine/engine.js";
 
 let e = game(480, 240, init, ["img/unnamed.png", "img/gabe.png"]);
 e.start();
-e.canvas.style.background = "black";
+e.canvas.style.background = "#2e86de";
 e.scaleToWindow();
 window.addEventListener("resize", event => {
 	e.scaleToWindow();
