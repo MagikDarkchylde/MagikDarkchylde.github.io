@@ -22,8 +22,6 @@ function init() {
 	//Creando Player 1
 	let frames = e.filmstrip(e.assets["img/unnamed.png"], 24, 24);
 	let playerSprite = e.sprite(frames);
-	playerSprite.x = 12;
-	playerSprite.y = 36;
 	playerSprite.fps = 12;
 	playerSprite.playSequence([1,6]);
 	//Player Shadow
