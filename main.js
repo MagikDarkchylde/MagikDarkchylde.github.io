@@ -27,7 +27,9 @@ function init() {
 	//Player Shadow
 	player = e.rectangle(10, 5, "white", "none", 0, 50, 50);
 	player.add(playerSprite);
-
+	playerSprite.x = -playerSprite.width/4;
+	playerSprite.y = -playerSprite.height + 3;
+	
 
 	//change state to loop
 	e.state = play;
