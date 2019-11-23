@@ -10,7 +10,7 @@ let e = game(
 		"img/atlas.png"
 	]);
 e.start();
-e.canvas.style.background = "#2e86de";
+e.canvas.style.background = "grey";
 e.scaleToWindow();
 window.addEventListener("resize", event => {
 	e.scaleToWindow();
@@ -19,6 +19,50 @@ window.addEventListener("resize", event => {
 let playerSprite, player, atlasFrames, barrelSprite, barrel, sortArray = [], collisionArray = [];
 
 function init() {
+	atlasFrames = e.filmstrip(e.assets["img/atlas.png"], 16, 16);
+
+	//draw map/background
+	let map2d = [
+		[5,6,7,5,6,7,5,4],
+		[516,516,516,513,514,514,514,515],
+		[516,517,518,545,546,546,546,547],
+		[516,517,518,577,578,578,578,579],
+		[516,516,516,5,6,5,7,4],
+		[516,516,516,516,517,518,516,516],
+		[5,6,7,5,6,7,5,4],
+		[5,6,7,5,6,7,5,4]
+	];
+
+	let map1d = map2d.reduce((a, b) => a.concat(b));
+
+	map1d.forEach((value, i) => {
+		let x = (i % 8) * 16;
+		let y = (Math.floor(i / 8)) * 16;
+		let tile = e.sprite(atlasFrames, x, y);
+		tile.show(value);
+	}); 
+
+	//draw details
+	let detail2d = [
+		[8,8,8,8,8,8,8,8],
+		[8,8,8,8,8,8,8,8],
+		[2,3,8,8,8,8,8,8],
+		[128,129,8,8,8,8,8,8],
+		[353,354,355,8,8,8,8,8],
+		[385,386,387,8,8,8,8,8],
+		[8,8,8,8,8,8,8,8],
+		[8,8,8,8,8,8,8,8]
+	];
+
+	let detail1d = detail2d.reduce((a, b) => a.concat(b));
+
+	detail1d.forEach((value, i) => {
+		let x = (i % 8) * 16;
+		let y = (Math.floor(i / 8)) * 16;
+		let tile = e.sprite(atlasFrames, x, y);
+		tile.show(value);
+	}); 
+
 	//Creando Player 1
 	let frames = e.filmstrip(e.assets["img/unnamed.png"], 24, 24);
 	playerSprite = e.sprite(frames);
@@ -41,16 +85,36 @@ function init() {
 
 
 	//objects
-	atlasFrames = e.filmstrip(e.assets["img/atlas.png"], 16, 16);
+	
 	barrelSprite = e.sprite(atlasFrames);
 	barrelSprite.show(0);
 	//shadow barrel
-	barrel = e.rectangle(10, 5, "white", "none", 0, 100, 50);
+	barrel = e.rectangle(10, 5, "white", "none", 0, 100, 30);
 	barrel.add(barrelSprite);
 	barrelSprite.x = -barrelSprite.width / 4;
 	barrelSprite.y = -barrelSprite.height + 3;
 	sortArray.push(barrel);
 	collisionArray.push(barrel);
+
+	//fence object
+
+	function createFence(atlas, value, x, y) {
+		let fence = e.sprite(atlas);
+		fence.show(value);
+		let shadow = e.rectangle(10, 5, "white", "none", 0, x, y);
+		shadow.add(fence);
+		fence.x = -fence.width / 4;
+		fence.y = -fence.height + 3;
+		sortArray.push(shadow);
+		collisionArray.push(shadow);
+	}
+
+	createFence(atlasFrames, 291, 46, 60);
+	createFence(atlasFrames, 292, 62, 60);
+	createFence(atlasFrames, 292, 78, 60);
+	createFence(atlasFrames, 292, 94, 60);
+	createFence(atlasFrames, 289, 110, 60);
+
 
 	//controls
 	let aKey = e.keyboard(e.keycode.A);
