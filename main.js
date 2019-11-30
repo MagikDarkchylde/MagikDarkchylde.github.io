@@ -16,7 +16,12 @@ window.addEventListener("resize", event => {
 	e.scaleToWindow();
 });
 //Global Vars
-let playerSprite, player, atlasFrames, barrelSprite, barrel, sortArray = [], collisionArray = [];
+let playerSprite, player, 
+	atlasFrames, 
+	barrelSprite, barrel,
+	sortArray = [],
+	itemArray = [], 
+	collisionArray = [];
 
 function init() {
 	atlasFrames = e.filmstrip(e.assets["img/atlas.png"], 16, 16);
@@ -35,6 +40,7 @@ function init() {
 
 	let map1d = map2d.reduce((a, b) => a.concat(b));
 
+	//crear tiles bg
 	map1d.forEach((value, i) => {
 		let x = (i % 8) * 16;
 		let y = (Math.floor(i / 8)) * 16;
@@ -63,6 +69,33 @@ function init() {
 		tile.show(value);
 	}); 
 
+	//create items
+	let items2d = [
+	[8,8,8,8,8,8,8,8],
+	[281,8,8,8,8,8,8,8],
+	[8,8,8,8,8,8,8,8],
+	[8,8,8,8,8,8,8,8],
+	[8,8,8,8,8,8,8,282],
+	[8,8,8,8,8,8,8,8],
+	[8,8,8,280,8,8,8,8],
+	[8,8,8,8,8,8,8,8]
+	];
+
+	let items1d = items2d.reduce((a, b) => a.concat(b));
+
+	items1d.forEach((value, i) => {
+		if (value !== 8) {
+			let x = (i % 8) * 16;
+			let y = (Math.floor(i / 8)) * 16;
+			let item = e.sprite(atlasFrames, x, y);
+			item.show(value);
+			item.name = "" + value;
+			item.isItem = true;
+			collisionArray.push(item);
+			itemArray.push(item);
+		}
+	});
+
 	//Creando Player 1
 	let frames = e.filmstrip(e.assets["img/unnamed.png"], 24, 24);
 	playerSprite = e.sprite(frames);
@@ -83,13 +116,20 @@ function init() {
 	}
 	sortArray.push(player);
 
+	//items
+	// sword = e.sprite(atlasFrames, 70, 80);
+	// sword.show(280);
+	// sword.name = "Excalibur";
+	// sword.isOnStage = true;
+	// sword.collision = false;
+	// collisionArray.push(sword);
 
 	//objects
-	
 	barrelSprite = e.sprite(atlasFrames);
 	barrelSprite.show(0);
 	//shadow barrel
 	barrel = e.rectangle(10, 5, "white", "none", 0, 100, 30);
+	barrel.name = "Barrel Object";
 	barrel.add(barrelSprite);
 	barrelSprite.x = -barrelSprite.width / 4;
 	barrelSprite.y = -barrelSprite.height + 3;
@@ -103,6 +143,7 @@ function init() {
 		fence.show(value);
 		let shadow = e.rectangle(10, 5, "white", "none", 0, x, y);
 		shadow.add(fence);
+		shadow.name = "Fence" + value;
 		fence.x = -fence.width / 4;
 		fence.y = -fence.height + 3;
 		sortArray.push(shadow);
@@ -121,6 +162,7 @@ function init() {
 	let dKey = e.keyboard(e.keycode.D);
 	let wKey = e.keyboard(e.keycode.W);
 	let sKey = e.keyboard(e.keycode.S);
+	
 	aKey.press = () => {
 		player.vx = -player.speed;
 		player.scaleX = -1;
@@ -130,6 +172,7 @@ function init() {
 		player.vx = 0;
 		playerSprite.show(0);
 	}
+
 	dKey.press = () => {
 		player.vx = player.speed;
 		player.scaleX = 1;
@@ -139,6 +182,7 @@ function init() {
 		player.vx = 0;
 		playerSprite.show(0);
 	}
+
 	wKey.press = () => {
 		player.vy = -player.speed;
 		playerSprite.playSequence(player.states.walk);
@@ -147,6 +191,7 @@ function init() {
 		player.vy = 0;
 		playerSprite.show(0);
 	}
+
 	sKey.press = () => {
 		player.vy = player.speed;
 		playerSprite.playSequence(player.states.walk);
@@ -155,6 +200,7 @@ function init() {
 		player.vy = 0;
 		playerSprite.show(0);
 	}
+	
 	//change state to loop
 	e.state = play;
 
@@ -167,10 +213,31 @@ function play() {
 	//update deepth sorting
 	e.sorting(sortArray);
 	//check for collition with objects
-	e.hit(player, collisionArray, false, false, true, (collition, sprite) =>{
-		player.x -= player.vx;
-		player.y -= player.vy;
-		player.vx = 0;
-		player.vy = 0;
+	objectCollison();
+}
+
+function objectCollison() {
+	let hitObject = e.hit(player, collisionArray, false, false, true, (collision, sprite) =>{
+		//stop player
+		if (sprite.isItem == undefined) {
+			player.x -= player.vx;
+			player.y -= player.vy;
+			player.vx = 0;
+			player.vy = 0;
+		}
+		//take items
+		itemArray.forEach(item => {
+			if (item == sprite && item.isItem) {
+				collisionArray.splice(collisionArray.indexOf(item), 1);
+				itemArray.splice(itemArray.indexOf(item), 1);
+				e.stage.remove(item);
+				item.isItem = false;
+			}
+		});
+		// if (sprite.name == "Excalibur" && sprite.isOnStage) {
+			// collisionArray.splice(collisionArray.indexOf(sword), 1);
+			// e.stage.remove(sword);
+			// sprite.isOnStage = false;
+		// }	
 	})
 }
