@@ -1,5 +1,6 @@
 import { game } from "./engine/engine.js";
-
+import{ createItemBox } from "./lib/itemBox.js";
+import{ createHUD } from "./lib/hud.js";
 let e = game(
 	480, 
 	240, 
@@ -21,7 +22,8 @@ let playerSprite, player,
 	barrelSprite, barrel,
 	sortArray = [],
 	itemArray = [], 
-	collisionArray = [];
+	collisionArray = [],
+	itemBox, hud;
 
 function init() {
 	atlasFrames = e.filmstrip(e.assets["img/atlas.png"], 16, 16);
@@ -71,7 +73,7 @@ function init() {
 
 	//create items
 	let items2d = [
-	[8,8,8,8,8,8,8,8],
+	[8,8,8,8,280,8,8,282],
 	[281,8,8,8,8,8,8,8],
 	[8,8,8,8,8,8,8,8],
 	[8,8,8,8,8,8,8,8],
@@ -156,6 +158,13 @@ function init() {
 	createFence(atlasFrames, 292, 94, 60);
 	createFence(atlasFrames, 289, 110, 60);
 
+	//init itemBox
+	itemBox = createItemBox(e, atlasFrames, 0, 128);
+
+	//init HUD
+	hud = createHUD(e, 2, 2);
+
+
 
 	//controls
 	let aKey = e.keyboard(e.keycode.A);
@@ -232,6 +241,10 @@ function objectCollison() {
 				itemArray.splice(itemArray.indexOf(item), 1);
 				e.stage.remove(item);
 				item.isItem = false;
+
+				itemBox.addItem(item.name);
+
+				hud.hit();
 			}
 		});
 		// if (sprite.name == "Excalibur" && sprite.isOnStage) {
